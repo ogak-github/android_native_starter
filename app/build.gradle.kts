@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.plugin)
+
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -35,9 +37,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+/*  Deprecated
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_21.toString()
-    }
+    }*/
+
     buildFeatures {
         compose = true
     }
@@ -60,6 +65,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    implementation(libs.compose.material.icons)
+
 
 
 
@@ -80,4 +87,12 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.gson.converter)
+
+
+    /// Navigator 3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.material3.adaptive.navigation3)
+    implementation(libs.kotlinx.serialization.core)
 }
