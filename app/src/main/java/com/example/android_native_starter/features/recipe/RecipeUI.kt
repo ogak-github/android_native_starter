@@ -46,7 +46,7 @@ fun RecipeView() {
                 EmptyView()
             } else {
                 RecipeList(recipes) { recipeId ->
-                    viewModel.onRecipeClicked(recipeId)
+                    viewModel.onRecipeClicked(recipeId.toInt())
                 }
             }
         }
@@ -60,7 +60,7 @@ fun RecipeView() {
         }
         null -> {
             // Initial state - show loading
-            LoadingView()
+            EmptyView()
         }
     }
 }
@@ -116,14 +116,14 @@ fun ErrorView(message: String, onRetry: () -> Unit) {
 }
 
 @Composable
-fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
+fun RecipeList(recipes: List<Recipe>, onRecipeClick: (Int) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
         items(recipes.size) { index ->
-            RecipeItem(recipes[index].name, onClick = { onRecipeClick(recipes[index].name) })
+            RecipeItem(recipes[index].name, onClick = { onRecipeClick(recipes[index].id) })
         }
     }
 }

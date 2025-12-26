@@ -22,10 +22,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 import android.os.Parcelable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.android_native_starter.core.utils.Resource
+import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class RecipeDetailKey(val recipeId: String) : NavKey, Parcelable
+data class RecipeDetailKey(val recipeId: Int) : NavKey, Parcelable
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -48,11 +57,18 @@ fun EntryProviderScope<NavKey>.recipeDetailEntryBuilder(appNavigator: AppNavigat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailUI(recipeId: String, onBackClick: () -> Unit) {
+fun RecipeDetailUI(recipeId: Int, onBackClick: () -> Unit) {
+    val viewModel: RecipeViewModel = hiltViewModel()
+    val recipeDetailState by viewModel.recipeDetailState.observeAsState()
+
+    LaunchedEffect(recipeId) {
+        viewModel.loadRecipeDetail(recipeId)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Recipe Detail: $recipeId") },
+                title = { Text("Recipe Detail") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -62,7 +78,36 @@ fun RecipeDetailUI(recipeId: String, onBackClick: () -> Unit) {
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Text("Details for recipe $recipeId")
+
+            when(val state = recipeDetailState) {
+                is Resource.Loading -> {
+                    LoadingView()
+                }
+
+                is Resource.Error -> {
+                    ErrorView(message = state.message ?: "Unknown error occurred", onRetry = {
+                        viewModel.loadRecipeDetail(recipeId.toInt())
+                    })
+
+                }
+
+                is Resource.Success -> {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Details for recipe:")
+                        Text("ID: $recipeId")
+                        Text("Recipe Name: ${recipeDetailState?.data?.name}")
+                        Text("Instructions: ${recipeDetailState?.data?.instructions}")
+                    }
+
+                }
+
+                null -> {
+                    EmptyView()
+                }
+            }
+
         }
     }
 }
