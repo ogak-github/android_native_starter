@@ -2,6 +2,8 @@ package com.example.android_native_starter.features.auth
 
 
 import androidx.compose.foundation.layout.Box
+import com.example.android_native_starter.router.AppNavigator
+import com.example.android_native_starter.features.MainKey
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,18 +25,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.EntryProviderScope
-import com.example.android_native_starter.router.NavKey
+import androidx.navigation3.runtime.NavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
-fun EntryProviderScope<NavKey>.loginEntryBuilder(
-    onLoginSuccess: () -> Unit
-) {
-    entry<NavKey.LoginUI> {
-            LoginUI()
+object LoginUI : NavKey
+
+fun EntryProviderScope<NavKey>.loginEntryBuilder(appNavigator: AppNavigator) {
+    entry(LoginUI) {
+        LoginUI(
+            onLoginSuccess = {
+                // Navigate to MainUI when login is successful
+                appNavigator.clearAndPush(MainKey)
+            }
+        )
     }
 }
 
@@ -44,29 +51,29 @@ fun EntryProviderScope<NavKey>.loginEntryBuilder(
 object LoginFeatureModule {
     @IntoSet
     @Provides
-    fun provideLoginEntryBuilder(): EntryProviderScope<NavKey>.() -> Unit = {
-        loginEntryBuilder(
-            onLoginSuccess = {
-                // ini nanti di-wire dari Nav root
-            }
-        )
+    fun provideLoginEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
+        loginEntryBuilder(appNavigator)
     }
 }
 
 
 @Composable
-fun LoginUI() {
-    Scaffold() {
+fun LoginUI(onLoginSuccess: () -> Unit) {
+    Scaffold {
         innerPadding -> Box(
             modifier = Modifier.padding(innerPadding)
-        )
-        LoginForm()
-
+        ) {
+            LoginForm(
+                onLoginSuccess = onLoginSuccess
+            )
+        }
     }
 }
 
 @Composable
-fun LoginForm() {
+fun LoginForm(
+    onLoginSuccess: () -> Unit
+) {
     val visibility = remember { mutableStateOf(false) }
 
     Box(
@@ -111,7 +118,10 @@ fun LoginForm() {
 
             ElevatedButton(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { }) {
+                onClick = {
+                    // Direct login - no validation logic
+                    onLoginSuccess()
+                }) {
                 Text("Login")
             }
         }

@@ -45,7 +45,9 @@ fun RecipeView() {
             if (recipes.isEmpty()) {
                 EmptyView()
             } else {
-                RecipeList(recipes)
+                RecipeList(recipes) { recipeId ->
+                    viewModel.onRecipeClicked(recipeId)
+                }
             }
         }
         is Resource.Error -> {
@@ -114,19 +116,27 @@ fun ErrorView(message: String, onRetry: () -> Unit) {
 }
 
 @Composable
-fun RecipeList(recipes: List<Recipe>) {
+fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
         items(recipes.size) { index ->
-            RecipeItem(recipes[index].name)
+            RecipeItem(recipes[index].name, onClick = { onRecipeClick(recipes[index].name) })
         }
     }
 }
 
 @Composable
-fun RecipeItem(name: String) {
-    Text(name)
+fun RecipeItem(name: String, onClick: () -> Unit) {
+    androidx.compose.material3.Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = name,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
 }

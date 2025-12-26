@@ -14,8 +14,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.example.android_native_starter.router.AppNavigator
+import com.example.android_native_starter.features.recipe.RecipeDetailKey
+
 @HiltViewModel
-class RecipeViewModel @Inject constructor(private val repo: RecipeRepository) : ViewModel() {
+class RecipeViewModel @Inject constructor(
+    private val repo: RecipeRepository,
+    private val appNavigator: AppNavigator
+) : ViewModel() {
+
+    fun onRecipeClicked(recipeId: String) {
+        appNavigator.push(RecipeDetailKey(recipeId))
+    }
 
     private val _recipeState = MutableLiveData<Resource<Recipes>>()
     val recipeState: LiveData<Resource<Recipes>> = _recipeState
