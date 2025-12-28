@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,11 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.example.android_native_starter.features.auth.LoginUI
 import com.example.android_native_starter.features.recipe.RecipeView
+import com.example.android_native_starter.router.AppNavigator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,28 +31,24 @@ import dagger.multibindings.IntoSet
 object MainModule {
     @IntoSet
     @Provides
-    fun provideMainEntryBuilder(appNavigator: com.example.android_native_starter.router.AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
+    fun provideMainEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
         mainEntryBuilder(appNavigator)
     }
 }
 
 object MainKey : NavKey
 
-fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: com.example.android_native_starter.router.AppNavigator) {
+fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(MainKey) {
         MainUI(
-            title = "Recipe",
-            onLogoutClick =  {
-                // Clear backStack and go back to Login
-                appNavigator.clearAndPush(LoginUI)
-            }
+            title = "Recipe"
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainUI(title: String = "Main", onLogoutClick: () -> Unit) {
+fun MainUI(title: String = "Main") {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -65,7 +58,9 @@ fun MainUI(title: String = "Main", onLogoutClick: () -> Unit) {
                 },
                 actions = {
                     IconButton(
-                        onClick = onLogoutClick
+                        onClick = {
+
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Logout,
