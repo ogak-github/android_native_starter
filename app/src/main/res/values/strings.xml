@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">android_native_starter</string>
+    <string name="app_name">Dummy</string>
     <string name="is_logged_in_key">is_logged_in</string>
 </resources>
