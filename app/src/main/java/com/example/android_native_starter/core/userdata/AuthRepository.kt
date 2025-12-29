@@ -17,7 +17,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun login(data: LoginData): Resource<User> {
         return try {
-            withContext(Dispatchers.Main) {
+
                 val result = authService.login(data)
                 Log.e("AuthRepository", "Login successful: ${result}")
                 
@@ -25,7 +25,6 @@ class AuthRepository @Inject constructor(
                 userDataService.saveToken(result.accessToken)
                 
                 Resource.Success(result)
-            }
 
         } catch (e: HttpException) {
             Log.e("AuthRepository", "Server error: ${e.code()} - ${e.message()}")
@@ -37,7 +36,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun logout() {
+     fun logout() {
         userDataService.clear()
     }
 

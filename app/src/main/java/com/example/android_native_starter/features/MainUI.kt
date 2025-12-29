@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.example.android_native_starter.features.auth.viewmodel.AuthViewModel
 import com.example.android_native_starter.features.recipe.RecipeView
 import com.example.android_native_starter.router.AppNavigator
 import dagger.Module
@@ -24,12 +26,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
+import javax.inject.Qualifier
 
+/*@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class FeatureEntry*/
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
 object MainModule {
     @IntoSet
+    //@FeatureEntry
     @Provides
     fun provideMainEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
         mainEntryBuilder(appNavigator)
@@ -49,6 +56,7 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainUI(title: String = "Main") {
+    val viewModel: AuthViewModel = hiltViewModel()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -59,7 +67,7 @@ fun MainUI(title: String = "Main") {
                 actions = {
                     IconButton(
                         onClick = {
-
+                            viewModel.logout()
                         }
                     ) {
                         Icon(

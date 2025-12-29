@@ -9,6 +9,7 @@ import com.example.android_native_starter.features.MainKey
 import com.example.android_native_starter.features.auth.data.model.LoginData
 import com.example.android_native_starter.core.userdata.User
 import com.example.android_native_starter.core.userdata.AuthRepository
+import com.example.android_native_starter.core.userdata.AuthSession
 import com.example.android_native_starter.router.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repo: AuthRepository,
-    private val appNavigator: AppNavigator
+    private val AuthSession: AuthSession,
 
-): ViewModel() {
+    ): ViewModel() {
 
     private val _loginState = MutableLiveData<Resource<User>>()
     val loginState: LiveData<Resource<User>> = _loginState
@@ -31,8 +32,16 @@ class AuthViewModel @Inject constructor(
             val result = repo.login(data)
             _loginState.postValue(result)
             if (result is Resource.Success) {
-                appNavigator.clearAndPush(MainKey)
+                AuthSession.onLoginSuccess()
+            } else if (result is Resource.Error) {
+                AuthSession.onLogout()
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch(Dispatchers.IO) {
+            AuthSession.onLogout()
         }
     }
 }
