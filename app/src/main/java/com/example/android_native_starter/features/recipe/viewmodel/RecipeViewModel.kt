@@ -25,7 +25,7 @@ class RecipeViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun onRecipeClicked(recipeId: Int) {
-        appNavigator.push(RecipeDetailKey(recipeId))
+        appNavigator.navigateTo(RecipeDetailKey(recipeId))
     }
 
     private val _recipeState = MutableLiveData<Resource<Recipes>>()
