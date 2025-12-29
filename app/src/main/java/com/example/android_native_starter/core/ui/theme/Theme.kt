@@ -1,4 +1,4 @@
-package com.example.android_native_starter.core.theme
+package com.example.android_native_starter.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
