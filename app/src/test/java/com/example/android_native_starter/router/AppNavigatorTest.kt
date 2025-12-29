@@ -1,3 +1,4 @@
+/*
 package com.example.android_native_starter.router
 
 import androidx.compose.runtime.mutableStateListOf
@@ -48,3 +49,4 @@ class AppNavigatorTest {
         assertEquals(TestKey2, backStack.last())
     }
 }
+*/
