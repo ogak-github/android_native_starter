@@ -7,19 +7,22 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 
 @Composable
 fun Nav3(
     entryBuilder: Set<EntryProviderScope<NavKey>.() -> Unit>,
-    backStack: SnapshotStateList<NavKey>,
+    backStack: List<NavKey>,
+    sceneStrategy: DialogSceneStrategy<NavKey>
 ) {
     NavDisplay(
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
           entryBuilder.forEach { it() }
         },
+        sceneStrategy = sceneStrategy
     )
 }
 

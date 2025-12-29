@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.android_native_starter.core.ui.components.ActionDialogKey
 import com.example.android_native_starter.core.utils.Resource
 import com.example.android_native_starter.features.MainKey
 import com.example.android_native_starter.features.auth.data.model.LoginData
@@ -19,8 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repo: AuthRepository,
-    private val AuthSession: AuthSession,
-
+    private val authSession: AuthSession,
     ): ViewModel() {
 
     private val _loginState = MutableLiveData<Resource<User>>()
@@ -32,16 +32,10 @@ class AuthViewModel @Inject constructor(
             val result = repo.login(data)
             _loginState.postValue(result)
             if (result is Resource.Success) {
-                AuthSession.onLoginSuccess()
+                authSession.onLoginSuccess()
             } else if (result is Resource.Error) {
-                AuthSession.onLogout()
+                authSession.onLogout()
             }
-        }
-    }
-
-    fun logout() {
-        viewModelScope.launch(Dispatchers.IO) {
-            AuthSession.onLogout()
         }
     }
 }

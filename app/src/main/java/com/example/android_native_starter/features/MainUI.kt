@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,23 +14,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.example.android_native_starter.features.auth.viewmodel.AuthViewModel
+
+import androidx.navigation3.scene.DialogSceneStrategy
+import com.example.android_native_starter.core.ui.components.ActionDialogComponent
+import com.example.android_native_starter.core.ui.components.ActionDialogKey
+
 import com.example.android_native_starter.features.recipe.RecipeView
 import com.example.android_native_starter.router.AppNavigator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
-import dagger.multibindings.IntoSet
-import javax.inject.Qualifier
 
-/*@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class FeatureEntry*/
+import dagger.multibindings.IntoSet
+import javax.inject.Inject
+
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -46,6 +51,22 @@ object MainModule {
 object MainKey : NavKey
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
+    entry(ActionDialogKey, metadata = DialogSceneStrategy.dialog(
+        DialogProperties(windowTitle = "Logout", dismissOnClickOutside = true, dismissOnBackPress = true)
+    )) { _ ->
+        ActionDialogComponent(
+            onDismissRequest = {
+                appNavigator.pop()
+            },
+            onConfirmation = {
+                appNavigator.authSession.onLogout()
+            },
+            dialogTitle = "Logout",
+            dialogText = "Are you sure you want to logout?",
+            icon = Icons.AutoMirrored.Filled.Logout
+        )
+    }
+
     entry(MainKey) {
         MainUI(
             title = "Recipe"
@@ -53,10 +74,14 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     }
 }
 
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainUI(title: String = "Main") {
-    val viewModel: AuthViewModel = hiltViewModel()
+    val nav: MainNavigator = hiltViewModel()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -67,11 +92,11 @@ fun MainUI(title: String = "Main") {
                 actions = {
                     IconButton(
                         onClick = {
-                            viewModel.logout()
+                           nav.navigator.navigateTo(ActionDialogKey)
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Logout,
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Logout"
                         )
                     }
