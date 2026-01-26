@@ -49,6 +49,7 @@ object MainModule {
 }
 
 object MainKey : NavKey
+object RecipeListKey : NavKey // New NavKey for RecipeList
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(ActionDialogKey, metadata = DialogSceneStrategy.dialog(
@@ -69,8 +70,12 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
 
     entry(MainKey) {
         MainUI(
-            title = "Recipe"
+            title = "Home"
         )
+    }
+
+    entry(RecipeListKey) {
+        RecipeView()
     }
 }
 
@@ -111,7 +116,14 @@ fun MainUI(title: String = "Main") {
                 verticalArrangement = Arrangement.SpaceBetween
 
             ) {
-                RecipeView()
+                // Change to MainMenuScreen
+                MainMenuScreen(
+                    onMenuItemClick = { itemId ->
+                        when (itemId) {
+                            "recipe" -> nav.navigator.navigateTo(RecipeListKey)
+                        }
+                    }
+                )
             }
         }
     }
