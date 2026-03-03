@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -33,7 +35,9 @@ data class MenuItem(
 @Composable
 fun MainMenuScreen(onMenuItemClick: (String) -> Unit) {
     val menuItems = listOf(
-        MenuItem(id = "recipe", title = "Recipe", icon = Icons.Default.RestaurantMenu)
+        MenuItem(id = "recipe", title = "Recipe", icon = Icons.Default.RestaurantMenu),
+        MenuItem(id = "todos", title = "Todos", icon = Icons.Default.NoteAlt),
+        MenuItem(id = "quotes", title= "99 Quotes", icon = Icons.Default.Abc),
         // Tambahkan menu lainnya di sini
     )
 

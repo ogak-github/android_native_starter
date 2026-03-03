@@ -28,6 +28,11 @@ class RecipeViewModel @Inject constructor(
         appNavigator.navigateTo(RecipeDetailKey(recipeId))
     }
 
+    fun onBackClicked() {
+        appNavigator.pop()
+    }
+
+
     private val _recipeState = MutableLiveData<Resource<Recipes>>()
     val recipeState: LiveData<Resource<Recipes>> = _recipeState
     private val _recipeDetailState = MutableLiveData<Resource<Recipe>>()

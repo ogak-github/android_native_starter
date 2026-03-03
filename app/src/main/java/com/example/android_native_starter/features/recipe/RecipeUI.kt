@@ -8,10 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,6 +35,7 @@ import com.example.android_native_starter.features.recipe.data.model.Recipe
 import com.example.android_native_starter.features.recipe.data.repository.Sort
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeView() {
     val viewModel: RecipeViewModel = hiltViewModel()
@@ -36,31 +45,48 @@ fun RecipeView() {
         viewModel.loadRecipes(10, 0, Sort.NAME.name.lowercase())
     }
 
-    when (val state = recipeState) {
-        is Resource.Loading -> {
-            LoadingView()
-        }
-        is Resource.Success -> {
-            val recipes = state.data?.recipes ?: emptyList()
-            if (recipes.isEmpty()) {
-                EmptyView()
-            } else {
-                RecipeList(recipes) { recipeId ->
-                    viewModel.onRecipeClicked(recipeId.toInt())
+    Scaffold( topBar = {
+        TopAppBar(
+            title = { Text("Recipe") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    viewModel.onBackClicked()
+                }) {
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                 }
             }
-        }
-        is Resource.Error -> {
-            ErrorView(
-                message = state.message ?: "Unknown error occurred",
-                onRetry = {
-                    viewModel.loadRecipes(10, 0, Sort.NAME.name.lowercase())
+        )
+    }) { it
+
+        when (val state = recipeState) {
+            is Resource.Loading -> {
+                LoadingView()
+            }
+
+            is Resource.Success -> {
+                val recipes = state.data?.recipes ?: emptyList()
+                if (recipes.isEmpty()) {
+                    EmptyView()
+                } else {
+                    RecipeList(recipes) { recipeId ->
+                        viewModel.onRecipeClicked(recipeId.toInt())
+                    }
                 }
-            )
-        }
-        null -> {
-            // Initial state - show loading
-            EmptyView()
+            }
+
+            is Resource.Error -> {
+                ErrorView(
+                    message = state.message ?: "Unknown error occurred",
+                    onRetry = {
+                        viewModel.loadRecipes(10, 0, Sort.NAME.name.lowercase())
+                    }
+                )
+            }
+
+            null -> {
+                // Initial state - show loading
+                EmptyView()
+            }
         }
     }
 }
@@ -117,6 +143,7 @@ fun ErrorView(message: String, onRetry: () -> Unit) {
 
 @Composable
 fun RecipeList(recipes: List<Recipe>, onRecipeClick: (Int) -> Unit) {
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

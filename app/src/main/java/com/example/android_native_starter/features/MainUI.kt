@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import com.example.android_native_starter.core.ui.components.ActionDialogComponent
 import com.example.android_native_starter.core.ui.components.ActionDialogKey
+import com.example.android_native_starter.features.quotes.QuotesUI
 
 import com.example.android_native_starter.features.recipe.RecipeView
 import com.example.android_native_starter.router.AppNavigator
@@ -49,7 +50,9 @@ object MainModule {
 }
 
 object MainKey : NavKey
-object RecipeListKey : NavKey // New NavKey for RecipeList
+object RecipeKey : NavKey // New NavKey for RecipeList
+object QuotesKey: NavKey
+
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(ActionDialogKey, metadata = DialogSceneStrategy.dialog(
@@ -74,7 +77,11 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
         )
     }
 
-    entry(RecipeListKey) {
+    entry(QuotesKey) {
+        QuotesUI()
+    }
+
+    entry(RecipeKey) {
         RecipeView()
     }
 }
@@ -120,7 +127,8 @@ fun MainUI(title: String = "Main") {
                 MainMenuScreen(
                     onMenuItemClick = { itemId ->
                         when (itemId) {
-                            "recipe" -> nav.navigator.navigateTo(RecipeListKey)
+                            "recipe" -> nav.navigator.navigateTo(RecipeKey)
+                            "quotes" -> nav.navigator.navigateTo(QuotesKey)
                         }
                     }
                 )
