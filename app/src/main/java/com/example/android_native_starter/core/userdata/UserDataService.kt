@@ -17,6 +17,7 @@ class UserDataService @Inject constructor(@ApplicationContext context: Context) 
 
     companion object {
         private const val KEY_TOKEN = "auth_token"
+        private const val KEY_USER_ID = "user_id"
     }
 
     fun saveToken(token: String) {
@@ -25,6 +26,14 @@ class UserDataService @Inject constructor(@ApplicationContext context: Context) 
 
     fun getToken(): String? {
         return prefs.getString(KEY_TOKEN, null)
+    }
+
+    fun saveUserId(userId: Int) {
+        prefs.edit().putInt(KEY_USER_ID, userId).apply()
+    }
+
+    fun getUserId(): Int {
+        return prefs.getInt(KEY_USER_ID, -1)
     }
 
     fun clear() {

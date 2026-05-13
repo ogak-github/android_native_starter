@@ -14,35 +14,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-
 import androidx.navigation3.scene.DialogSceneStrategy
 import com.example.android_native_starter.core.ui.components.ActionDialogComponent
 import com.example.android_native_starter.core.ui.components.ActionDialogKey
 import com.example.android_native_starter.features.quotes.QuotesUI
-
 import com.example.android_native_starter.features.recipe.RecipeView
+import com.example.android_native_starter.features.todos.ui.TodoView
 import com.example.android_native_starter.router.AppNavigator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
-
 import dagger.multibindings.IntoSet
-import javax.inject.Inject
-
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
 object MainModule {
     @IntoSet
-    //@FeatureEntry
     @Provides
     fun provideMainEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
         mainEntryBuilder(appNavigator)
@@ -50,9 +43,9 @@ object MainModule {
 }
 
 object MainKey : NavKey
-object RecipeKey : NavKey // New NavKey for RecipeList
-object QuotesKey: NavKey
-
+object RecipeKey : NavKey
+object QuotesKey : NavKey
+object TodoKey : NavKey
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(ActionDialogKey, metadata = DialogSceneStrategy.dialog(
@@ -72,9 +65,7 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     }
 
     entry(MainKey) {
-        MainUI(
-            title = "Home"
-        )
+        MainRoute(title = "Home")
     }
 
     entry(QuotesKey) {
@@ -84,29 +75,47 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(RecipeKey) {
         RecipeView()
     }
+
+    entry(TodoKey) {
+        TodoView()
+    }
 }
 
-
-
+@Composable
+fun MainRoute(
+    title: String,
+    modifier: Modifier = Modifier,
+    viewModel: MainNavigator = hiltViewModel()
+) {
+    MainScreen(
+        title = title,
+        onLogoutClick = { viewModel.navigator.navigateTo(ActionDialogKey) },
+        onMenuItemClick = { itemId ->
+            when (itemId) {
+                "recipe" -> viewModel.navigator.navigateTo(RecipeKey)
+                "quotes" -> viewModel.navigator.navigateTo(QuotesKey)
+                "todos" -> viewModel.navigator.navigateTo(TodoKey)
+            }
+        },
+        modifier = modifier
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainUI(title: String = "Main") {
-    val nav: MainNavigator = hiltViewModel()
-
+fun MainScreen(
+    title: String,
+    onLogoutClick: () -> Unit,
+    onMenuItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = title)
-                },
+                title = { Text(text = title) },
                 actions = {
-                    IconButton(
-                        onClick = {
-                           nav.navigator.navigateTo(ActionDialogKey)
-                        }
-                    ) {
+                    IconButton(onClick = onLogoutClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Logout"
@@ -115,22 +124,14 @@ fun MainUI(title: String = "Main") {
                 }
             )
         },
-
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
-
             ) {
-                // Change to MainMenuScreen
                 MainMenuScreen(
-                    onMenuItemClick = { itemId ->
-                        when (itemId) {
-                            "recipe" -> nav.navigator.navigateTo(RecipeKey)
-                            "quotes" -> nav.navigator.navigateTo(QuotesKey)
-                        }
-                    }
+                    onMenuItemClick = onMenuItemClick
                 )
             }
         }

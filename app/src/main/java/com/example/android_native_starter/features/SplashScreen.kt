@@ -23,26 +23,28 @@ import kotlinx.coroutines.delay
 
 object SplashScreenKey : NavKey
 
-
-
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen(
+    onTimeout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
         animationSpec = tween(
             durationMillis = 3000
-        )
+        ),
+        label = "SplashAlpha"
     )
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         startAnimation = true
         delay(4000)
         onTimeout()
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center

@@ -1,57 +1,52 @@
 package com.example.android_native_starter.features.auth
 
-
-import androidx.compose.foundation.layout.Box
-import com.example.android_native_starter.router.AppNavigator
-import com.example.android_native_starter.features.MainKey
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.example.android_native_starter.core.utils.Resource
 import com.example.android_native_starter.features.auth.data.model.LoginData
 import com.example.android_native_starter.features.auth.viewmodel.AuthViewModel
+import com.example.android_native_starter.features.auth.viewmodel.LoginUiEvent
+import com.example.android_native_starter.features.auth.viewmodel.LoginUiState
+import com.example.android_native_starter.router.AppNavigator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
-import javax.inject.Qualifier
 
 object LoginKey : NavKey
 
 fun EntryProviderScope<NavKey>.loginEntryBuilder(appNavigator: AppNavigator) {
     entry(LoginKey) {
-        LoginUI()
+        LoginRoute()
     }
 }
-
-
-
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -63,119 +58,193 @@ object LoginFeatureModule {
     }
 }
 
+@Composable
+fun LoginRoute(
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LoginScreen(
+        uiState = uiState,
+        onLoginClick = { data -> viewModel.onEvent(LoginUiEvent.Login(data)) },
+        modifier = modifier
+    )
+}
+
+@Preview(name = "Loading State", showBackground = true)
+@Composable
+fun LoginScreenLoadingPreview() {
+    LoginScreen(
+        uiState = LoginUiState(isLoading = false),
+        onLoginClick = {}
+    )
+}
 
 @Composable
-fun LoginUI() {
-    Scaffold {
-        innerPadding -> Box(
-            modifier = Modifier.padding(innerPadding)
+fun LoginScreen(
+    uiState: LoginUiState,
+    onLoginClick: (LoginData) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            LoginForm()
+            LoginForm(
+                uiState = uiState,
+                onLoginClick = onLoginClick,
+                modifier = Modifier.widthIn(max = 400.dp)
+            )
         }
     }
 }
-
 
 @Composable
 fun LoginForm(
-
+    uiState: LoginUiState,
+    onLoginClick: (LoginData) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val viewModel: AuthViewModel = hiltViewModel()
-    val loginState by viewModel.loginState.observeAsState()
-    val visibility = remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val isPasswordVisible = remember { mutableStateOf(false) }
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        // Header Section
+        Text(
+            text = "Welcome Back",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = "Sign in to continue your journey",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
 
-            TextField(
-                value = username.value,
-                onValueChange = {
-                   username.value = it
-                },
-                label = { Text("Username") }
-            )
+        // Form Fields
+        OutlinedTextField(
+            value = username.value,
+            onValueChange = { username.value = it },
+            label = { Text("Username") },
+            placeholder = { Text("Enter your username") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
+            shape = MaterialTheme.shapes.medium
+        )
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            TextField(
-                value = password.value,
-                onValueChange = {
-                    password.value = it
-                },
-                label = { Text("Password") },
-                visualTransformation = if (visibility.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            visibility.value = !visibility.value
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (visibility.value)
-                                Icons.Default.Visibility
-                            else
-                                Icons.Default.VisibilityOff,
-                            contentDescription = "Toggle password visibility"
-                        )
-                    }
+        OutlinedTextField(
+            value = password.value,
+            onValueChange = { password.value = it },
+            label = { Text("Password") },
+            placeholder = { Text("Enter your password") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                IconButton(onClick = { isPasswordVisible.value = !isPasswordVisible.value }) {
+                    Icon(
+                        imageVector = if (isPasswordVisible.value)
+                            Icons.Default.Visibility
+                        else
+                            Icons.Default.VisibilityOff,
+                        contentDescription = "Toggle password visibility"
+                    )
                 }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            when(val state = loginState) {
-                is Resource.Error -> {
-                    if(state.message?.contains("400") ?: false) {
-                        Text("Invalid username or password", color = Color.Red)
-                    } else {
-                        Text("${state.message}", color = Color.Red)
-                    }
-
+            },
+            visualTransformation = if (isPasswordVisible.value) 
+                VisualTransformation.None 
+            else 
+                PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    onLoginClick(LoginData(username.value.trim(), password.value.trim()))
                 }
-                is Resource.Success -> {
-                    null
-                }
-                is Resource.Loading -> {
-                    null
-                }
-                null -> null
+            ),
+            shape = MaterialTheme.shapes.medium
+        )
+
+        // Error message
+        uiState.error?.let { message ->
+            val displayMessage = if (message.contains("400")) {
+                "Invalid username or password"
+            } else {
+                message
             }
-            ElevatedButton(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                   viewModel.login(LoginData(
-                       username = username.value.trim(),
-                       password = password.value.trim()
-                   ))
-                }) {
-                when(val state = loginState) {
-                    is Resource.Error -> {
-                        Text("Login")
-                    }
-                    is Resource.Loading -> {
-                        Text("Authenticating...")
-                    }
-                    is Resource.Success -> {
-                        Text("Login")
-                    }
-                    null -> {
-                        Text("Login")
-                    }
-                }
+            Text(
+                text = displayMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 8.dp, start = 4.dp)
+            )
+        }
 
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                focusManager.clearFocus()
+                onLoginClick(LoginData(username.value.trim(), password.value.trim()))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            enabled = !uiState.isLoading,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 }
-

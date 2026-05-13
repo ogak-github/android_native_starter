@@ -33,16 +33,18 @@ data class MenuItem(
 )
 
 @Composable
-fun MainMenuScreen(onMenuItemClick: (String) -> Unit) {
+fun MainMenuScreen(
+    onMenuItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val menuItems = listOf(
         MenuItem(id = "recipe", title = "Recipe", icon = Icons.Default.RestaurantMenu),
         MenuItem(id = "todos", title = "Todos", icon = Icons.Default.NoteAlt),
         MenuItem(id = "quotes", title= "99 Quotes", icon = Icons.Default.Abc),
-        // Tambahkan menu lainnya di sini
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,18 +65,23 @@ fun MainMenuScreen(onMenuItemClick: (String) -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             items(menuItems) { item ->
-                MenuItemCard(item = item) {
-                    onMenuItemClick(item.id)
-                }
+                MenuItemCard(
+                    item = item,
+                    onClick = { onMenuItemClick(item.id) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun MenuItemCard(item: MenuItem, onClick: () -> Unit) {
+fun MenuItemCard(
+    item: MenuItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
