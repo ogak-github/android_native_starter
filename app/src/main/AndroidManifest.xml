@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Wajib untuk Android 13+ -->
+
+
     <application
         android:name=".AppEntry"
         android:allowBackup="true"
@@ -24,7 +28,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
+
+        <receiver
+            android:name=".core.application.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.example.TEST_BOOT"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
+

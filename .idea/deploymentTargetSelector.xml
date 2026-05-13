@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-12-26T04:37:34.106969Z">
+        <DropdownSelection timestamp="2026-05-12T08:51:09.041974191Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/ogak/.android/avd/Pixel_9_Pro_API_35.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/ogak/.android/avd/Galaxy_S25.avd" />
             </handle>
           </Target>
         </DropdownSelection>
