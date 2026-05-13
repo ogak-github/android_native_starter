@@ -78,8 +78,6 @@ dependencies {
     ksp(libs.hilt.compiler)
     //kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
-
-
     implementation(libs.androidx.livedata.ktx)
     implementation(libs.androidx.viewmodel.ktx)
     implementation(libs.androidx.viewmodel.compose)
@@ -93,6 +91,9 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
 
+    /// Coil
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.network.okhttp)
 
     /// Navigator 3
     implementation(libs.androidx.navigation3.ui)

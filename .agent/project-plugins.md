@@ -6,5 +6,6 @@ This project using:
 - Navigation 3
 - Hilt Dependency
 - Retrofit
+- Coil
 
 You can add any plugins you want but if it's really needed.

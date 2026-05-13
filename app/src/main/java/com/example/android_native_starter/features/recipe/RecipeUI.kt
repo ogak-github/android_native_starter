@@ -3,15 +3,20 @@ package com.example.android_native_starter.features.recipe
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,16 +31,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.android_native_starter.core.ui.components.EmptyView
 import com.example.android_native_starter.core.ui.components.ErrorView
 import com.example.android_native_starter.core.ui.components.LoadingView
 import com.example.android_native_starter.core.utils.Resource
 import com.example.android_native_starter.features.recipe.data.model.Recipe
+import com.example.android_native_starter.features.recipe.data.model.Recipes
 import com.example.android_native_starter.features.recipe.data.repository.Sort
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeUiState
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
@@ -60,6 +71,70 @@ fun RecipeView(
     )
 }
 
+@Preview(showSystemUi = true)
+@Composable
+fun RecipeScreenPreview() {
+    var recipes: Recipes = Recipes(
+        total = 10,
+        skip = 0,
+        limit = 1,
+        recipes = listOf(
+            Recipe(
+                id = 1,
+                name = "Classic Margherita Pizza",
+                ingredients = listOf(
+                    "Pizza dough",
+                    "Tomato sauce",
+                    "Fresh mozzarella cheese",
+                    "Fresh basil leaves",
+                    "Olive oil",
+                    "Salt and pepper to taste"
+                ),
+                instructions = listOf(
+                    "Preheat the oven to 475°F (245°C).",
+                    "Roll out the pizza dough and spread tomato sauce evenly.",
+                    "Top with slices of fresh mozzarella and fresh basil leaves.",
+                    "Drizzle with olive oil and season with salt and pepper.",
+                    "Bake in the preheated oven for 12-15 minutes or until the crust is golden brown.",
+                    "Slice and serve hot."
+                ),
+                prepTimeMinutes = 30,
+                cookTimeMinutes = 15,
+                servings = 5,
+                difficulty = "easy",
+                cuisine = "Italy",
+                caloriesPerServing = 300.0,
+                tags = listOf(
+                    "Pizza",
+                    "Italian"
+                ),
+                userId = 45,
+                image = "https://cdn.dummyjson.com/recipe-images/1.webp",
+                mealType = listOf<String>(
+                    "Dinner"
+                ),
+                rating = 4.3,
+                reviewCount = 1000
+            )
+        )
+    )
+                
+
+
+
+    RecipeScreen(
+        uiState = RecipeUiState(
+            recipeResource = Resource.Success(recipes)
+        ),
+        onBackClick = {},
+        onRecipeClick = {},
+        onRetry = { }
+    )
+}
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeScreen(
@@ -82,7 +157,9 @@ fun RecipeScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        Box(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
             when (val state = uiState.recipeResource) {
                 is Resource.Loading -> LoadingView()
                 is Resource.Success -> {
@@ -121,6 +198,7 @@ fun RecipeList(
         items(recipes, key = { it.id }) { recipe ->
             RecipeItem(
                 name = recipe.name,
+                imageUrl = recipe.image,
                 onClick = { onRecipeClick(recipe.id) }
             )
         }
@@ -130,6 +208,7 @@ fun RecipeList(
 @Composable
 fun RecipeItem(
     name: String,
+    imageUrl: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -137,9 +216,30 @@ fun RecipeItem(
         onClick = onClick,
         modifier = modifier.fillMaxSize()
     ) {
-        Text(
-            text = name,
+
+        Card(
+            shape = CardDefaults.elevatedShape,
+            onClick = onClick,
             modifier = Modifier.padding(16.dp)
-        )
+        ) {
+            Row(
+                Modifier.padding(8.dp)
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = name,
+                    modifier = Modifier
+                        .size(84.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop
+                )
+
+                Text(
+                    text = name,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
+
     }
 }

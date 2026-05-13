@@ -29,10 +29,11 @@ import com.example.android_native_starter.core.utils.Resource
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeDetailUiState
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
 import com.example.android_native_starter.router.AppNavigator
+import com.example.android_native_starter.router.EntryBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import kotlinx.parcelize.Parcelize
 
@@ -40,11 +41,11 @@ import kotlinx.parcelize.Parcelize
 data class RecipeDetailKey(val recipeId: Int) : NavKey, Parcelable
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 object RecipeDetailModule {
     @IntoSet
     @Provides
-    fun provideRecipeDetailEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
+    fun provideRecipeDetailEntryBuilder(appNavigator: AppNavigator): @JvmSuppressWildcards EntryBuilder = {
         recipeDetailEntryBuilder(appNavigator)
     }
 }
