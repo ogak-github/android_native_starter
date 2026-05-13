@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -197,8 +198,7 @@ fun RecipeList(
     ) {
         items(recipes, key = { it.id }) { recipe ->
             RecipeItem(
-                name = recipe.name,
-                imageUrl = recipe.image,
+                recipe = recipe,
                 onClick = { onRecipeClick(recipe.id) }
             )
         }
@@ -207,8 +207,7 @@ fun RecipeList(
 
 @Composable
 fun RecipeItem(
-    name: String,
-    imageUrl: String,
+    recipe: Recipe,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -226,18 +225,29 @@ fun RecipeItem(
                 Modifier.padding(8.dp)
             ) {
                 AsyncImage(
-                    model = imageUrl,
-                    contentDescription = name,
+                    model = recipe.image,
+                    contentDescription = recipe.name,
                     modifier = Modifier
                         .size(84.dp)
                         .clip(MaterialTheme.shapes.medium),
                     contentScale = ContentScale.Crop
                 )
 
-                Text(
-                    text = name,
+                Column(
                     modifier = Modifier.padding(8.dp)
-                )
+                ) {
+                    Text(
+                        text = recipe.name,
+                        modifier = Modifier.padding(8.dp),
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = recipe.cuisine,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+
+
             }
         }
 
