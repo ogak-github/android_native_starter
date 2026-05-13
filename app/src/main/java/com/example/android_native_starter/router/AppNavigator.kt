@@ -1,13 +1,11 @@
 package com.example.android_native_starter.router
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
-import com.example.android_native_starter.core.ui.components.ActionDialogKey
 import com.example.android_native_starter.core.userdata.AuthSession
 import com.example.android_native_starter.features.MainKey
-import com.example.android_native_starter.features.SplashScreen
 import com.example.android_native_starter.features.SplashScreenKey
 import com.example.android_native_starter.features.auth.LoginKey
 import kotlinx.coroutines.CoroutineScope
@@ -18,9 +16,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+typealias EntryBuilder = EntryProviderScope<NavKey>.() -> Unit
 
 sealed interface NavigatorInterface {
-    val backStack: List<NavKey> // State yang akan diobservasi UI
+    val backStack: List<NavKey>
     val dialogScene: DialogSceneStrategy<NavKey>
     fun navigateTo(key: NavKey)
     fun pop()

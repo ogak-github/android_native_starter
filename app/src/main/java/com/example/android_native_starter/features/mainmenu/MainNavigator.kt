@@ -1,4 +1,4 @@
-package com.example.android_native_starter.features
+package com.example.android_native_starter.features.mainmenu
 
 import androidx.lifecycle.ViewModel
 import com.example.android_native_starter.router.AppNavigator

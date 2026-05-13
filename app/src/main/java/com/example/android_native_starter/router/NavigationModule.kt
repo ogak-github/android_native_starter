@@ -7,22 +7,30 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.Multibinds
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-
-
 @Module
 @InstallIn(SingletonComponent::class)
-object NavigationModule {
+abstract class NavigationModule {
 
-    @Provides
-    @Singleton
-    fun providerAppNavigator(authSession: AuthSession, externalScope: CoroutineScope ): AppNavigator = AppNavigator(authSession, externalScope)
+    @Multibinds
+    abstract fun entryBuilderSet(): Set<@JvmSuppressWildcards EntryBuilder>
 
-    @Provides
-    fun provideBackStack(navigator: AppNavigator): List<NavKey> = navigator.backStack
+    companion object {
+        @Provides
+        @Singleton
+        fun providerAppNavigator(
+            authSession: AuthSession,
+            externalScope: CoroutineScope
+        ): AppNavigator = AppNavigator(authSession, externalScope)
 
-    @Provides
-    fun provideDialogScene(navigator: AppNavigator): DialogSceneStrategy<NavKey> = navigator.dialogScene
+        @Provides
+        fun provideBackStack(navigator: AppNavigator): List<NavKey> = navigator.backStack
+
+        @Provides
+        fun provideDialogScene(navigator: AppNavigator): DialogSceneStrategy<NavKey> =
+            navigator.dialogScene
+    }
 }

@@ -3,9 +3,9 @@ package com.example.android_native_starter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.example.android_native_starter.core.ui.theme.AndroidNativeStarterTheme
+import com.example.android_native_starter.router.EntryBuilder
 import com.example.android_native_starter.router.Nav3
 import com.example.android_native_starter.router.AppNavigator
 
@@ -20,10 +20,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navigator: AppNavigator
 
     @Inject
-    //@FeatureEntry
-    lateinit var entryBuilder: Set<
-            @JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit
-            >
+    lateinit var entryBuilder: Set<@JvmSuppressWildcards EntryBuilder>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

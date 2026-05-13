@@ -34,10 +34,11 @@ import com.example.android_native_starter.features.auth.viewmodel.AuthViewModel
 import com.example.android_native_starter.features.auth.viewmodel.LoginUiEvent
 import com.example.android_native_starter.features.auth.viewmodel.LoginUiState
 import com.example.android_native_starter.router.AppNavigator
+import com.example.android_native_starter.router.EntryBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 
 object LoginKey : NavKey
@@ -49,11 +50,11 @@ fun EntryProviderScope<NavKey>.loginEntryBuilder(appNavigator: AppNavigator) {
 }
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 object LoginFeatureModule {
     @IntoSet
     @Provides
-    fun provideLoginEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
+    fun provideLoginEntryBuilder(appNavigator: AppNavigator): @JvmSuppressWildcards EntryBuilder = {
         loginEntryBuilder(appNavigator)
     }
 }

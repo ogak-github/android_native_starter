@@ -22,22 +22,25 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import com.example.android_native_starter.core.ui.components.ActionDialogComponent
 import com.example.android_native_starter.core.ui.components.ActionDialogKey
+import com.example.android_native_starter.features.mainmenu.MainMenuScreen
+import com.example.android_native_starter.features.mainmenu.MainNavigator
 import com.example.android_native_starter.features.quotes.QuotesUI
 import com.example.android_native_starter.features.recipe.RecipeView
 import com.example.android_native_starter.features.todos.ui.TodoView
 import com.example.android_native_starter.router.AppNavigator
+import com.example.android_native_starter.router.EntryBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 object MainModule {
     @IntoSet
     @Provides
-    fun provideMainEntryBuilder(appNavigator: AppNavigator): EntryProviderScope<NavKey>.() -> Unit = {
+    fun provideMainEntryBuilder(appNavigator: AppNavigator): @JvmSuppressWildcards EntryBuilder = {
         mainEntryBuilder(appNavigator)
     }
 }
