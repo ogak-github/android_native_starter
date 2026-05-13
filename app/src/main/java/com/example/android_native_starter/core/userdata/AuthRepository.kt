@@ -23,6 +23,7 @@ class AuthRepository @Inject constructor(
                 
                 // Save token so we stay logged in
                 userDataService.saveToken(result.accessToken)
+                userDataService.saveUserId(result.id)
                 
                 Resource.Success(result)
 
