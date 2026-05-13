@@ -87,9 +87,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.runtime.livedata)
 
-
+    /// Retrofit & Okhttp logging
     implementation(libs.retrofit)
     implementation(libs.gson.converter)
+    implementation(libs.okhttp.core)
+    implementation(libs.okhttp.logging)
 
 
     /// Navigator 3
