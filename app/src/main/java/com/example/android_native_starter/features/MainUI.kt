@@ -26,6 +26,7 @@ import com.example.android_native_starter.features.mainmenu.MainMenuScreen
 import com.example.android_native_starter.features.mainmenu.MainNavigator
 import com.example.android_native_starter.features.quotes.QuotesUI
 import com.example.android_native_starter.features.recipe.RecipeView
+import com.example.android_native_starter.features.social.SocialView
 import com.example.android_native_starter.features.todos.ui.TodoView
 import com.example.android_native_starter.router.AppNavigator
 import com.example.android_native_starter.router.EntryBuilder
@@ -49,6 +50,7 @@ object MainKey : NavKey
 object RecipeKey : NavKey
 object QuotesKey : NavKey
 object TodoKey : NavKey
+object SocialKey : NavKey
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(ActionDialogKey, metadata = DialogSceneStrategy.dialog(
@@ -82,6 +84,10 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
     entry(TodoKey) {
         TodoView()
     }
+
+    entry(SocialKey) {
+        SocialView()
+    }
 }
 
 @Composable
@@ -98,6 +104,7 @@ fun MainRoute(
                 "recipe" -> viewModel.navigator.navigateTo(RecipeKey)
                 "quotes" -> viewModel.navigator.navigateTo(QuotesKey)
                 "todos" -> viewModel.navigator.navigateTo(TodoKey)
+                "social" -> viewModel.navigator.navigateTo(SocialKey)
             }
         },
         modifier = modifier
