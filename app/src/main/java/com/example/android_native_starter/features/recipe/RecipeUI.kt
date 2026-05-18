@@ -26,9 +26,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,24 +53,21 @@ import com.example.android_native_starter.features.recipe.data.model.Recipe
 import com.example.android_native_starter.features.recipe.data.model.Recipes
 import com.example.android_native_starter.features.recipe.data.repository.Sort
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeUiState
-import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
+import com.example.android_native_starter.features.recipe.viewmodel.RecipeListViewModel
 
 @Composable
 fun RecipeView(
     modifier: Modifier = Modifier,
-    viewModel: RecipeViewModel = hiltViewModel()
+    viewModel: RecipeListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadRecipes(10, 0, Sort.NAME.name.lowercase())
-    }
 
     RecipeScreen(
         uiState = uiState,
         onBackClick = viewModel::onBackClicked,
         onRecipeClick = viewModel::onRecipeClicked,
-        onRetry = { viewModel.loadRecipes(10, 0, Sort.NAME.name.lowercase()) },
+        onRetry = { viewModel.loadRecipes(viewModel.sortBy, isNextPage = true) },
+        onLoadMore = { viewModel.loadRecipes(viewModel.sortBy, isNextPage = true) },
         modifier = modifier
     )
 }
@@ -129,12 +129,10 @@ fun RecipeScreenPreview() {
         ),
         onBackClick = {},
         onRecipeClick = {},
-        onRetry = { }
+        onRetry = { },
+        onLoadMore = { }
     )
 }
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,6 +141,7 @@ fun RecipeScreen(
     onBackClick: () -> Unit,
     onRecipeClick: (Int) -> Unit,
     onRetry: () -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -170,15 +169,28 @@ fun RecipeScreen(
                     } else {
                         RecipeList(
                             recipes = recipes,
-                            onRecipeClick = onRecipeClick
+                            onRecipeClick = onRecipeClick,
+                            onLoadMore = onLoadMore
                         )
                     }
                 }
                 is Resource.Error -> {
-                    ErrorView(
-                        message = state.message ?: "Unknown error occurred",
-                        onRetry = onRetry
-                    )
+                    // Jika ada data lama (saat load more error), tetap tampilkan list tapi mungkin dengan snackbar error
+                    // Tapi untuk saat ini kita ikuti logic awal: tampilkan ErrorView jika ada error
+                    val recipes = state.data?.recipes ?: emptyList()
+                    if (recipes.isNotEmpty()) {
+                         RecipeList(
+                            recipes = recipes,
+                            onRecipeClick = onRecipeClick,
+                            onLoadMore = onLoadMore
+                        )
+                        // TODO: Tampilkan snackbar error
+                    } else {
+                        ErrorView(
+                            message = state.message ?: "Unknown error occurred",
+                            onRetry = onRetry
+                        )
+                    }
                 }
             }
         }
@@ -189,9 +201,26 @@ fun RecipeScreen(
 fun RecipeList(
     recipes: List<Recipe>,
     onRecipeClick: (Int) -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val listState = rememberLazyListState()
+
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem != null && lastVisibleItem.index >= recipes.size - 2
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            onLoadMore()
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxSize()
             .padding(4.dp)
