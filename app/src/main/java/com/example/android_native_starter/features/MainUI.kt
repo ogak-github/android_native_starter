@@ -35,6 +35,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import kotlinx.serialization.Serializable
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,10 +47,15 @@ object MainModule {
     }
 }
 
+@Serializable
 object MainKey : NavKey
+@Serializable
 object RecipeKey : NavKey
+@Serializable
 object QuotesKey : NavKey
+@Serializable
 object TodoKey : NavKey
+@Serializable
 object SocialKey : NavKey
 
 fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
@@ -73,19 +79,19 @@ fun EntryProviderScope<NavKey>.mainEntryBuilder(appNavigator: AppNavigator) {
         MainRoute(title = "Home")
     }
 
-    entry(QuotesKey) {
+    entry<QuotesKey>() {
         QuotesUI()
     }
 
-    entry(RecipeKey) {
+    entry<RecipeKey>() {
         RecipeView()
     }
 
-    entry(TodoKey) {
+    entry<TodoKey>() {
         TodoView()
     }
 
-    entry(SocialKey) {
+    entry<SocialKey>() {
         SocialView()
     }
 }
