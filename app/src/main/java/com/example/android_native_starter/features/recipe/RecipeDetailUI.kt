@@ -1,20 +1,20 @@
 package com.example.android_native_starter.features.recipe
 
 import android.os.Parcelable
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,13 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.metadata
-import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import coil3.compose.AsyncImage
 import com.example.android_native_starter.core.ui.components.EmptyView
 import com.example.android_native_starter.core.ui.components.ErrorView
 import com.example.android_native_starter.core.ui.components.LoadingView
@@ -37,6 +39,7 @@ import com.example.android_native_starter.features.recipe.viewmodel.RecipeDetail
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeDetailViewModel
 import com.example.android_native_starter.router.AppNavigator
 import com.example.android_native_starter.router.EntryBuilder
+import com.example.android_native_starter.router.LocalSharedTransitionScope
 import com.example.android_native_starter.router.verticalSlideMetadata
 import dagger.Module
 import dagger.Provides
@@ -129,8 +132,11 @@ fun RecipeDetailScreen(
                         EmptyView()
                     } else {
                         Column(modifier = Modifier.padding(16.dp)) {
+                            RecipeImageCard(
+                                recipeImage = recipe.image,
+                                recipeContentDescription = recipe.name
+                            )
                             Text("Details for recipe:")
-                            Text("ID: ${recipe.id}")
                             Text("Recipe Name: ${recipe.name}")
                             Text("Instructions: ${recipe.instructions}")
                         }
@@ -139,4 +145,52 @@ fun RecipeDetailScreen(
             }
         }
     }
+}
+
+
+@Composable
+fun RecipeImageCard(recipeImage: String, recipeContentDescription: String?) {
+    val sharedScope = LocalSharedTransitionScope.current
+    val animatedScope = LocalNavAnimatedContentScope.current
+
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp)
+    ) {
+        Box {
+            if(sharedScope != null) {
+                with(sharedScope) {
+                    AsyncImage(
+                        model = recipeImage,
+                        contentDescription = recipeContentDescription,
+                        modifier = Modifier
+                            .fillMaxSize()
+
+                            .sharedElement(
+                                sharedContentState = rememberSharedContentState(key = recipeContentDescription + recipeImage),
+                                animatedVisibilityScope = animatedScope,
+                            )
+                            .clip(MaterialTheme.shapes.medium),
+                        contentScale = ContentScale.Crop,
+                        clipToBounds = true
+                    )
+                }
+
+            } else {
+                AsyncImage(
+                    model = recipeImage,
+                    contentDescription = recipeContentDescription,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(MaterialTheme.shapes.large),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+        }
+    }
+
 }
