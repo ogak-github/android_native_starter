@@ -17,12 +17,19 @@ fun Nav3(
     backStack: List<NavKey>,
     sceneStrategy: DialogSceneStrategy<NavKey>
 ) {
-    NavDisplay(
+   /* NavDisplay(
         backStack = backStack,
         entryProvider = entryProvider {
           entryBuilder.forEach { it() }
         },
         sceneStrategy = sceneStrategy
+    )*/
+    NavDisplay(
+        backStack = backStack,
+        entryProvider = entryProvider {
+            entryBuilder.forEach { it() }
+        },
+        sceneStrategies = listOf(sceneStrategy)
     )
 }
 
