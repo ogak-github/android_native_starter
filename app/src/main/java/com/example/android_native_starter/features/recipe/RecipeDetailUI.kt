@@ -1,6 +1,11 @@
 package com.example.android_native_starter.features.recipe
 
 import android.os.Parcelable
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,14 +27,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.metadata
+import androidx.navigation3.ui.NavDisplay
 import com.example.android_native_starter.core.ui.components.EmptyView
 import com.example.android_native_starter.core.ui.components.ErrorView
 import com.example.android_native_starter.core.ui.components.LoadingView
 import com.example.android_native_starter.core.utils.Resource
 import com.example.android_native_starter.features.recipe.viewmodel.RecipeDetailUiState
-import com.example.android_native_starter.features.recipe.viewmodel.RecipeViewModel
+import com.example.android_native_starter.features.recipe.viewmodel.RecipeDetailViewModel
 import com.example.android_native_starter.router.AppNavigator
 import com.example.android_native_starter.router.EntryBuilder
+import com.example.android_native_starter.router.verticalSlideMetadata
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,7 +59,10 @@ object RecipeDetailModule {
 }
 
 fun EntryProviderScope<NavKey>.recipeDetailEntryBuilder(appNavigator: AppNavigator) {
-    entry<RecipeDetailKey> { key ->
+    entry<RecipeDetailKey>(
+        // override GLOBAL animation in Nav3.kt
+        metadata = verticalSlideMetadata,
+    ) { key ->
         RecipeDetailRoute(
             recipeId = key.recipeId,
             onBackClick = { appNavigator.pop() }
@@ -64,7 +75,7 @@ fun RecipeDetailRoute(
     recipeId: Int,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RecipeViewModel = hiltViewModel()
+    viewModel: RecipeDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.detailUiState.collectAsStateWithLifecycle()
 
@@ -74,7 +85,6 @@ fun RecipeDetailRoute(
 
     RecipeDetailScreen(
         uiState = uiState,
-        recipeId = recipeId,
         onBackClick = onBackClick,
         onRetry = { viewModel.loadRecipeDetail(recipeId) },
         modifier = modifier
@@ -85,7 +95,6 @@ fun RecipeDetailRoute(
 @Composable
 fun RecipeDetailScreen(
     uiState: RecipeDetailUiState,
-    recipeId: Int,
     onBackClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -103,7 +112,9 @@ fun RecipeDetailScreen(
             )
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+        Box(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()) {
             when (val state = uiState.detailResource) {
                 is Resource.Loading -> LoadingView()
                 is Resource.Error -> {
